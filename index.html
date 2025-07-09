@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast Food Clicker Tycoon</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Base styles from Tailwind */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(to bottom right, #fef08a, #fb923c); /* from-yellow-200 to-orange-400 */
+            color: #1f2937; /* gray-800 */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            box-sizing: border-box; /* Ensure padding/border included in element's total width and height */
+        }
+
+        .container {
+            width: 100%;
+            max-width: 64rem; /* max-w-4xl */
+            background-color: #ffffff; /* bg-white */
+            border-radius: 1rem; /* rounded-2xl */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* shadow-2xl */
+            padding: 1.5rem; /* p-6 */
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2.25rem; /* text-4xl */
+            line-height: 2.5rem; /* sm:text-5xl */
+            font-weight: 800; /* font-extrabold */
+            text-align: center;
+            color: #dc2626; /* text-red-700 */
+            margin-bottom: 2rem; /* mb-8 */
+            filter: drop-shadow(0 4px 3px rgba(0, 0, 0, 0.07)) drop-shadow(0 2px 2px rgba(0, 0, 0, 0.06)); /* drop-shadow-lg */
+        }
+
+        .nav-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem; /* gap-4 */
+            margin-bottom: 2rem; /* mb-8 */
+        }
+
+        .nav-button {
+            padding: 0.75rem 1.5rem; /* py-3 px-6 */
+            border-radius: 9999px; /* rounded-full */
+            font-weight: 700; /* font-bold */
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms; /* transition duration-300 */
+            transform: scale(1); /* ease-in-out transform hover:scale-105 */
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+
+        .nav-button:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-button.active {
+            background-color: #dc2626; /* bg-red-600 */
+            color: #ffffff; /* text-white */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+        }
+
+        .nav-button:not(.active) {
+            background-color: #f87171; /* bg-red-400 */
+            color: #ffffff; /* text-white */
+        }
+
+        .nav-button:not(.active):hover {
+            background-color: #ef4444; /* hover:bg-red-500 */
+        }
+
+        .nav-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* Content Area Styles */
+        .content-area {
+            padding: 1.5rem; /* p-6 */
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06); /* shadow-inner */
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Specific content area backgrounds */
+        .content-area.main-game { background-color: #fffbeb; /* bg-yellow-100 */ }
+        .content-area.shop { background-color: #eff6ff; /* bg-blue-100 */ }
+        .content-area.inventory { background-color: #fee2e2; /* bg-red-100 */ }
+        .content-area.upgrades { background-color: #ede9fe; /* bg-purple-100 */ }
+        .content-area.powerups-shop { background-color: #dcfce7; /* bg-green-100 */ }
+
+        .money-display {
+            font-size: 2.25rem; /* text-3xl */
+            line-height: 2.5rem; /* sm:text-4xl */
+            font-weight: 700; /* font-bold */
+            color: #111827; /* gray-900 */
+            margin-bottom: 1rem; /* mb-4 */
+        }
+
+        .click-power-display {
+            font-size: 1.25rem; /* text-xl */
+            line-height: 1.75rem; /* sm:text-2xl */
+            color: #374151; /* gray-700 */
+            margin-bottom: 1.5rem; /* mb-6 */
+        }
+
+        .main-click-button {
+            background-color: #22c55e; /* bg-green-500 */
+            color: #ffffff; /* text-white */
+            font-weight: 700; /* font-bold */
+            padding: 1rem 2rem; /* py-4 px-8 */
+            border-radius: 9999px; /* rounded-full */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms; /* duration-300 */
+            transform: scale(1); /* transform hover:scale-105 */
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .main-click-button:hover {
+            background-color: #16a34a; /* hover:bg-green-600 */
+            transform: scale(1.05);
+        }
+
+        .main-click-button:active {
+            background-color: #15803d; /* active:bg-green-700 */
+        }
+
+        .main-click-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.5); /* focus:ring-4 focus:ring-green-300 */
+        }
+
+        .main-click-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* Shop specific styles */
+        .shop h2, .inventory h2, .upgrades h2, .powerups-shop h2 {
+            font-size: 1.5rem; /* text-2xl */
+            line-height: 2rem;
+            margin-bottom: 1rem; /* mb-4 */
+        }
+        .shop h2 { color: #1e40af; /* text-blue-800 */ }
+        .inventory h2 { color: #b91c1c; /* text-red-800 */ }
+        .upgrades h2 { color: #6d28d9; /* text-purple-800 */ }
+        .powerups-shop h2 { color: #16a34a; /* text-green-800 */ }
+
+        .shop-description {
+            font-size: 1.25rem; /* text-xl */
+            color: #374151; /* gray-700 */
+            margin-bottom: 1.5rem; /* mb-6 */
+        }
+
+        .mystery-box-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* grid-cols-1 */
+            gap: 1rem; /* gap-4 */
+            width: 100%;
+            max-width: 48rem; /* max-w-2xl */
+        }
+
+        @media (min-width: 640px) { /* sm */
+            .mystery-box-grid {
+                grid-template-columns: repeat(2, 1fr); /* sm:grid-cols-2 */
+            }
+        }
+
+        @media (min-width: 1024px) { /* lg */
+            .mystery-box-grid {
+                grid-template-columns: repeat(3, 1fr); /* lg:grid-cols-3 */
+            }
+        }
+
+        .mystery-box-button {
+            padding: 1rem 1.5rem; /* py-4 px-6 */
+            border-radius: 0.75rem; /* rounded-xl */
+            font-weight: 700; /* font-bold */
+            color: #ffffff; /* text-white */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms; /* duration-300 */
+            transform: scale(1); /* transform hover:scale-105 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .mystery-box-button:hover {
+            transform: scale(1.05);
+        }
+
+        .mystery-box-button.enabled {
+            background-color: #9333ea; /* bg-purple-600 */
+        }
+        .mystery-box-button.enabled:hover {
+            background-color: #7e22ce; /* hover:bg-purple-700 */
+        }
+        .mystery-box-button.enabled:active {
+            background-color: #6b21a8; /* active:bg-purple-800 */
+        }
+        .mystery-box-button.disabled {
+            background-color: #9ca3af; /* bg-gray-400 */
+            cursor: not-allowed;
+        }
+
+        .mystery-box-button span:first-child {
+            font-size: 1.25rem; /* text-xl */
+            margin-bottom: 0.25rem; /* mb-1 */
+        }
+        .mystery-box-button span:last-child {
+            font-size: 0.875rem; /* text-sm */
+        }
+
+        .rarity-odds {
+            margin-top: 2rem; /* mt-8 */
+            text-align: left;
+            width: 100%;
+            max-width: 28rem; /* max-w-md */
+        }
+
+        .rarity-odds h3 {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* font-semibold */
+            color: #1f2937; /* gray-800 */
+            margin-bottom: 0.5rem; /* mb-2 */
+        }
+
+        .rarity-odds ul {
+            list-style-type: disc;
+            list-style-position: inside;
+            color: #374151; /* gray-700 */
+        }
+
+        /* Inventory specific styles */
+        .inventory-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem; /* gap-4 */
+            margin-bottom: 1rem; /* mb-4 */
+        }
+
+        .inventory-tab-button {
+            padding: 0.5rem 1rem; /* py-2 px-4 */
+            border-radius: 9999px; /* rounded-full */
+            font-weight: 700; /* font-bold */
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 200ms; /* duration-200 */
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .inventory-tab-button.active {
+            background-color: #dc2626; /* bg-red-600 */
+            color: #ffffff;
+        }
+
+        .inventory-tab-button:not(.active) {
+            background-color: #f87171; /* bg-red-400 */
+            color: #ffffff;
+        }
+
+        .inventory-tab-button:not(.active):hover {
+            background-color: #ef4444; /* hover:bg-red-500 */
+        }
+
+        .inventory-tab-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .equipped-count {
+            text-align: center;
+            color: #4b5563; /* gray-600 */
+            margin-bottom: 1rem; /* mb-4 */
+        }
+
+        .inventory-list {
+            max-height: 24rem; /* max-h-96 */
+            overflow-y-auto;
+            padding-right: 0.5rem; /* pr-2 */
+            width: 100%;
+        }
+
+        .inventory-item {
+            background-color: #ffffff; /* bg-white */
+            padding: 1rem; /* p-4 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem; /* space-y-3 */
+        }
+
+        .inventory-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .inventory-item-name {
+            font-weight: 600; /* font-semibold */
+            font-size: 1.125rem; /* text-lg */
+        }
+
+        .inventory-item-status {
+            font-size: 0.875rem; /* text-sm */
+            color: #4b5563; /* gray-600 */
+        }
+
+        .rarity-common { color: #6b7280; /* gray-500 */ }
+        .rarity-uncommon { color: #16a34a; /* green-600 */ }
+        .rarity-rare { color: #2563eb; /* blue-600 */ }
+        .rarity-epic { color: #9333ea; /* purple-600 */ }
+        .rarity-legendary { color: #eab308; /* yellow-600 */ }
+        .rarity-mythic { color: #b91c1c; /* red-700 */ }
+
+        .inventory-item-actions {
+            display: flex;
+            gap: 0.5rem; /* space-x-2 */
+        }
+
+        .inventory-action-button {
+            padding: 0.5rem 1rem; /* py-2 px-4 */
+            border-radius: 9999px; /* rounded-full */
+            font-weight: 600; /* font-semibold */
+            color: #ffffff; /* text-white */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow */
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 200ms; /* duration-200 */
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .inventory-action-button.equip {
+            background-color: #22c55e; /* bg-green-500 */
+        }
+        .inventory-action-button.equip:hover {
+            background-color: #16a34a; /* hover:bg-green-600 */
+        }
+        .inventory-action-button.unequip {
+            background-color: #f97316; /* bg-orange-500 */
+        }
+        .inventory-action-button.unequip:hover {
+            background-color: #ea580c; /* hover:bg-orange-600 */
+        }
+        .inventory-action-button.sell {
+            background-color: #6b7280; /* bg-gray-500 */
+        }
+        .inventory-action-button.sell:hover {
+            background-color: #4b5563; /* hover:bg-gray-600 */
+        }
+        .inventory-action-button:disabled {
+            background-color: #d1d5db; /* bg-gray-300 */
+            color: #6b7280; /* text-gray-500 */
+            cursor: not-allowed;
+        }
+
+        /* Upgrade/Powerup list styles */
+        .upgrade-list, .powerup-list {
+            max-height: 24rem; /* max-h-96 */
+            overflow-y-auto;
+            padding-right: 0.5rem; /* pr-2 */
+            width: 100%;
+        }
+
+        .upgrade-item, .powerup-item {
+            background-color: #ffffff; /* bg-white */
+            padding: 1rem; /* p-4 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem; /* space-y-3 */
+        }
+
+        .upgrade-item:last-child, .powerup-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .upgrade-name, .powerup-name {
+            font-weight: 600; /* font-semibold */
+            font-size: 1.125rem; /* text-lg */
+        }
+
+        .upgrade-description, .powerup-description {
+            font-size: 0.875rem; /* text-sm */
+            color: #4b5563; /* gray-600 */
+        }
+
+        .buy-button {
+            padding: 0.5rem 1rem; /* py-2 px-4 */
+            border-radius: 9999px; /* rounded-full */
+            font-weight: 600; /* font-semibold */
+            color: #ffffff; /* text-white */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow */
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 200ms; /* duration-200 */
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .upgrade-item .buy-button {
+            background-color: #14b8a6; /* bg-teal-500 */
+        }
+        .upgrade-item .buy-button:hover {
+            background-color: #0d9488; /* hover:bg-teal-600 */
+        }
+        .powerup-item .buy-button {
+            background-color: #3b82f6; /* bg-blue-500 */
+        }
+        .powerup-item .buy-button:hover {
+            background-color: #2563eb; /* hover:bg-blue-600 */
+        }
+
+        .buy-button:disabled {
+            background-color: #d1d5db; /* bg-gray-300 */
+            color: #6b7280; /* text-gray-500 */
+            cursor: not-allowed;
+        }
+
+        /* Beat Game Button */
+        .beat-game-button {
+            margin-top: 2rem; /* mt-8 */
+            background-color: #db2777; /* bg-pink-600 */
+            color: #ffffff; /* text-white */
+            font-weight: 700; /* font-bold */
+            padding: 1rem 2.5rem; /* py-4 px-10 */
+            border-radius: 9999px; /* rounded-full */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* shadow-xl */
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms; /* duration-300 */
+            transform: scale(1); /* transform hover:scale-105 */
+            font-size: 1.5rem; /* text-2xl */
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .beat-game-button:hover {
+            background-color: #be185d; /* hover:bg-pink-700 */
+            transform: scale(1.05);
+        }
+
+        .beat-game-button:active {
+            background-color: #9d174d; /* active:bg-pink-800 */
+        }
+
+        .beat-game-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(244, 114, 182, 0.5); /* focus:ring-4 focus:ring-pink-300 */
+        }
+
+        .beat-game-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* Footer */
+        .footer-text {
+            margin-top: 2rem; /* mt-8 */
+            font-size: 0.875rem; /* text-sm */
+            color: #4b5563; /* gray-600 */
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5); /* bg-black bg-opacity-50 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .modal-content {
+            padding: 2rem; /* p-8 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* shadow-xl */
+            max-width: 24rem; /* max-w-sm */
+            width: 100%;
+            text-align: center;
+        }
+
+        .modal-content.white-bg {
+            background-color: #ffffff; /* bg-white */
+        }
+
+        .modal-message {
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 700; /* font-bold */
+            color: #1f2937; /* gray-800 */
+            margin-bottom: 1rem; /* mb-4 */
+        }
+
+        .modal-close-button {
+            background-color: #2563eb; /* bg-blue-600 */
+            color: #ffffff; /* text-white */
+            font-weight: 700; /* font-bold */
+            padding: 0.5rem 1.5rem; /* py-2 px-6 */
+            border-radius: 9999px; /* rounded-full */
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms; /* duration-300 */
+            transform: scale(1); /* transform hover:scale-105 */
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .modal-close-button:hover {
+            background-color: #1d4ed8; /* hover:bg-blue-700 */
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div id="app-root" class="w-full flex flex-col items-center justify-center">
+        <!-- Content will be rendered here by JavaScript -->
+    </div>
+
+    <script>
+        // --- Game Data ---
+        // Function to shuffle an array (Fisher-Yates algorithm)
+        const shuffleArray = (array) => {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        };
+
+        const RARITY_PROBABILITIES = {
+            'Common': 0.489,
+            'Uncommon': 0.30,
+            'Rare': 0.15,
+            'Epic': 0.04,
+            'Legendary': 0.02,
+            'Mythic': 0.001,
+        };
+
+        const MYSTERY_BOX_COSTS = {
+            'globalGiants': 900,
+            'chickenChampions': 800,
+            'burgerGrillHeroes': 800,
+            'classicFastFood': 600,
+            'subsWrapsBowls': 700,
+            'pizzaPlayers': 700,
+        };
+
+        const DUPLICATE_REFUND_PERCENTAGE = 0.25;
+
+        const getInitialBrands = () => {
+            const allBrandsData = [
+                { id: 'mcdonalds', name: 'McDonald’s', baseValue: 15, cost: 1500, rarity: 'Uncommon', category: 'globalGiants' },
+                { id: 'burgerking', name: 'Burger King', baseValue: 14, cost: 1400, rarity: 'Uncommon', category: 'globalGiants' },
+                { id: 'kfc', name: 'KFC', baseValue: 13, cost: 1300, rarity: 'Uncommon', category: 'globalGiants' },
+                { id: 'subway', name: 'Subway', baseValue: 12, cost: 1200, rarity: 'Uncommon', category: 'globalGiants' },
+                { id: 'starbucks', name: 'Starbucks', baseValue: 25, cost: 25000, rarity: 'Rare', category: 'globalGiants' },
+                { id: 'tacobell', name: 'Taco Bell', baseValue: 11, cost: 1100, rarity: 'Common', category: 'globalGiants' },
+                { id: 'dunkin', name: 'Dunkin’', baseValue: 10, cost: 1000, rarity: 'Common', category: 'globalGiants' },
+                { id: 'popeyes', name: 'Popeyes', baseValue: 16, cost: 1600, rarity: 'Uncommon', category: 'globalGiants' },
+                { id: 'wendys', name: 'Wendy’s', baseValue: 17, cost: 1700, rarity: 'Uncommon', category: 'globalGiants' },
+                { id: 'chipotle', name: 'Chipotle', baseValue: 26, cost: 26000, rarity: 'Rare', category: 'globalGiants' },
+                { id: 'fiveguys', name: 'Five Guys', baseValue: 18, cost: 1800, rarity: 'Uncommon', category: 'globalGiants' },
+                { id: 'aw', name: 'A&W', baseValue: 9, cost: 900, rarity: 'Common', category: 'globalGiants' },
+                { id: 'pretamanger', name: 'Pret A Manger', baseValue: 8, cost: 800, rarity: 'Common', category: 'globalGiants' },
+                { id: 'autogrill', name: 'Autogrill', baseValue: 7, cost: 700, rarity: 'Common', category: 'globalGiants' },
+                { id: 'chickfila', name: 'Chick-fil-A', baseValue: 91, cost: 100000, rarity: 'Epic', category: 'globalGiants' },
+                { id: 'goldenspoon', name: 'The Golden Spoon', baseValue: 500, cost: 5000000, rarity: 'Mythic', category: 'globalGiants' },
+            ];
+            const finalBrands = allBrandsData.map(brand => ({
+                ...brand,
+                owned: false,
+                equipped: false,
+                sellValue: Math.floor(brand.cost * 0.5),
+            }));
+            return shuffleArray(finalBrands);
+        };
+
+        const initialUpgrades = [
+            { id: 'clickPower1', name: 'Click Power Boost I', description: 'Increases base click power by 1', cost: 150, level: 0, maxLevel: 1, effect: { type: 'clickPower', value: 1 } },
+            { id: 'brandValue1', name: 'Brand Value Boost I', description: 'Increases equipped brand values by 10%', cost: 450, level: 0, maxLevel: 1, effect: { type: 'brandValueMultiplier', value: 0.1 } },
+            { id: 'clickPower2', name: 'Click Power Boost II', description: 'Increases base click power by 2', cost: 900, level: 0, maxLevel: 1, effect: { type: 'clickPower', value: 2 } },
+            { id: 'brandValue2', name: 'Brand Value Boost II', description: 'Increases equipped brand values by 20%', cost: 1800, level: 0, maxLevel: 1, effect: { type: 'brandValueMultiplier', value: 0.2 } },
+            { id: 'clickPower3', name: 'Click Power Boost III', description: 'Increases base click power by 3', cost: 3600, level: 0, maxLevel: 1, effect: { type: 'clickPower', value: 3 } },
+            { id: 'brandValue3', name: 'Brand Value Boost III', description: 'Increases equipped brand values by 30%', cost: 7200, level: 0, maxLevel: 1, effect: { type: 'brandValueMultiplier', value: 0.3 } },
+            { id: 'clickPower4', name: 'Click Power Boost IV', description: 'Increases base click power by 5', cost: 14400, level: 0, maxLevel: 1, effect: { type: 'clickPower', value: 5 } },
+            { id: 'brandValue4', name: 'Brand Value Boost IV', description: 'Increases equipped brand values by 50%', cost: 28800, level: 0, maxLevel: 1, effect: { type: 'brandValueMultiplier', value: 0.5 } },
+            { id: 'clickPower5', name: 'Click Power Boost V', description: 'Increases base click power by 10', cost: 57600, level: 0, maxLevel: 1, effect: { type: 'clickPower', value: 10 } },
+            { id: 'ultimateClick', name: 'Ultimate Click Power', description: 'Massively increases click power by 50', cost: 115200, level: 0, maxLevel: 1, effect: { type: 'clickPower', value: 50 } },
+        ];
+
+        const initialPowerups = [
+            { id: 'autoClicker1', name: 'Auto Clicker Lv.1', description: 'Automatically clicks 1 time per second', cost: 1000, owned: false, equipped: false, effect: { type: 'autoClick', value: 1 } },
+            { id: 'moneyMagnet', name: 'Money Magnet', description: 'Increases all money earned by 5%', cost: 2500, owned: false, equipped: false, effect: { type: 'moneyMultiplier', value: 0.05 } },
+            { id: 'superClick', name: 'Super Click', description: 'Adds +5 to click power', cost: 5000, owned: false, equipped: false, effect: { type: 'clickPower', value: 5 } },
+            { id: 'autoClicker2', name: 'Auto Clicker Lv.2', description: 'Automatically clicks 3 times per second', cost: 10000, owned: false, equipped: false, effect: { type: 'autoClick', value: 3 } },
+            { id: 'brandBoost', name: 'Brand Boost', description: 'Increases equipped brand values by 15%', cost: 15000, owned: false, equipped: false, effect: { type: 'brandValueMultiplier', value: 0.15 } },
+            { id: 'megaClick', name: 'Mega Click', description: 'Adds +15 to click power', cost: 25000, owned: false, equipped: false, effect: { type: 'clickPower', value: 15 } },
+            { id: 'autoClicker3', name: 'Auto Clicker Lv.3', description: 'Automatically clicks 10 times per second', cost: 50000, owned: false, equipped: false, effect: { type: 'autoClick', value: 10 } },
+            { id: 'ultimateFortune', name: 'Ultimate Fortune', description: 'Increases all money earned by 20%', cost: 75000, owned: false, equipped: false, effect: { type: 'moneyMultiplier', value: 0.20 } },
+        ];
+
+        // --- Game State Variables (Global for simplicity in plain JS) ---
+        let money;
+        let baseClickPower = 1;
+        let brands;
+        let upgrades;
+        let powerups;
+        let message = '';
+        let isMessagePersistent = false;
+        let isMessageWhiteBackground = false; // For mobile warning
+        let showBeatGameButton = false;
+        let currentView = 'main';
+        let currentInventoryView = 'brands';
+
+        let clickTimestamps = [];
+        let autoClickWarningCount;
+        let isBanned;
+        let banEndTime;
+
+        let isMobileWarningActive = false;
+
+        // Auto-clicker detection parameters
+        const DETECTION_INTERVAL_MS = 1000; // 1 second
+        const MAX_HUMAN_CLICKS_PER_INTERVAL = 15; // Max clicks considered human in 1 second
+
+        // --- Local Storage Management ---
+        const saveGame = () => {
+            localStorage.setItem('fastFoodClickerMoney', money.toString());
+            localStorage.setItem('fastFoodClickerBrands', JSON.stringify(brands));
+            localStorage.setItem('fastFoodClickerUpgrades', JSON.stringify(upgrades));
+            localStorage.setItem('fastFoodClickerPowerups', JSON.stringify(powerups));
+            localStorage.setItem('fastFoodClickerWarningCount', autoClickWarningCount.toString());
+            localStorage.setItem('fastFoodClickerIsBanned', JSON.stringify(isBanned));
+            localStorage.setItem('fastFoodClickerBanEndTime', banEndTime.toString());
+            console.log("Game Saved:", { money, autoClickWarningCount, isBanned, banEndTime });
+        };
+
+        const loadGame = () => {
+            money = parseFloat(localStorage.getItem('fastFoodClickerMoney')) || 0;
+            brands = JSON.parse(localStorage.getItem('fastFoodClickerBrands')) || getInitialBrands();
+            upgrades = JSON.parse(localStorage.getItem('fastFoodClickerUpgrades')) || initialUpgrades;
+            powerups = JSON.parse(localStorage.getItem('fastFoodClickerPowerups')) || initialPowerups;
+            autoClickWarningCount = parseInt(localStorage.getItem('fastFoodClickerWarningCount')) || 0;
+            isBanned = JSON.parse(localStorage.getItem('fastFoodClickerIsBanned')) || false;
+            banEndTime = parseInt(localStorage.getItem('fastFoodClickerBanEndTime')) || 0;
+
+            // Ensure brands and powerups have 'equipped' property if loaded from older save
+            brands = brands.map(b => ({ ...b, equipped: b.equipped !== undefined ? b.equipped : false }));
+            powerups = powerups.map(p => ({ ...p, equipped: p.equipped !== undefined ? p.equipped : false }));
+
+            console.log("Game Loaded:", { money, autoClickWarningCount, isBanned, banEndTime });
+        };
+
+        // --- UI Rendering Functions ---
+        const updateUI = () => {
+            const appRoot = document.getElementById('app-root');
+            appRoot.innerHTML = `
+                <h1 class="text-4xl sm:text-5xl font-extrabold text-center text-red-700 mb-8 drop-shadow-lg">
+                    Fast Food Clicker Tycoon
+                </h1>
+
+                <div class="nav-buttons">
+                    <button id="mainGameBtn" class="nav-button ${currentView === 'main' ? 'active' : ''}" ${isBanned || isMobileWarningActive ? 'disabled' : ''}>
+                        Main Game
+                    </button>
+                    <button id="shopBtn" class="nav-button ${currentView === 'shop' ? 'active' : ''}" ${isBanned || isMobileWarningActive ? 'disabled' : ''}>
+                        Shop
+                    </button>
+                    <button id="inventoryBtn" class="nav-button ${currentView === 'inventory' ? 'active' : ''}" ${isBanned || isMobileWarningActive ? 'disabled' : ''}>
+                        Inventory
+                    </button>
+                    <button id="upgradesBtn" class="nav-button ${currentView === 'upgrades' ? 'active' : ''}" ${isBanned || isMobileWarningActive ? 'disabled' : ''}>
+                        Upgrades
+                    </button>
+                    <button id="powerupsBtn" class="nav-button ${currentView === 'powerups' ? 'active' : ''}" ${isBanned || isMobileWarningActive ? 'disabled' : ''}>
+                        Powerups
+                    </button>
+                </div>
+
+                <div id="contentArea" class="container content-area ${getContentAreaClass()}">
+                    <!-- Content will be dynamically inserted here -->
+                </div>
+
+                ${showBeatGameButton ? `
+                    <button id="beatGameBtn" class="beat-game-button" ${isBanned || isMobileWarningActive ? 'disabled' : ''}>
+                        Beat the Game!
+                    </button>
+                ` : ''}
+
+                <p class="footer-text">
+                    Made with ❤️ for fast food lovers.
+                </p>
+            `;
+
+            // Attach event listeners for navigation buttons
+            document.getElementById('mainGameBtn').onclick = () => { currentView = 'main'; updateUI(); };
+            document.getElementById('shopBtn').onclick = () => { currentView = 'shop'; updateUI(); };
+            document.getElementById('inventoryBtn').onclick = () => { currentView = 'inventory'; updateUI(); };
+            document.getElementById('upgradesBtn').onclick = () => { currentView = 'upgrades'; updateUI(); };
+            document.getElementById('powerupsBtn').onclick = () => { currentView = 'powerups'; updateUI(); };
+
+            if (showBeatGameButton) {
+                document.getElementById('beatGameBtn').onclick = handleBeatGame;
+            }
+
+            renderContent();
+            renderMessageModal();
+            saveGame(); // Save game state after every UI update
+        };
+
+        const getContentAreaClass = () => {
+            switch (currentView) {
+                case 'shop': return 'shop';
+                case 'inventory': return 'inventory';
+                case 'upgrades': return 'upgrades';
+                case 'powerups': return 'powerups-shop';
+                case 'main': default: return 'main-game';
+            }
+        };
+
+        const renderContent = () => {
+            const contentArea = document.getElementById('contentArea');
+            let html = '';
+
+            switch (currentView) {
+                case 'shop':
+                    html = `
+                        <h2 class="text-2xl sm:text-3xl font-bold text-blue-800 mb-4 text-center">Mystery Box Shop</h2>
+                        <p class="text-xl text-gray-700 mb-6">Choose a category to open a Mystery Box!</p>
+                        <div class="mystery-box-grid">
+                            ${Object.entries(MYSTERY_BOX_COSTS).map(([categoryKey, cost]) => `
+                                <button class="mystery-box-button ${money >= cost && !isBanned && !isMobileWarningActive ? 'enabled' : 'disabled'}"
+                                    data-category="${categoryKey}" ${money < cost || isBanned || isMobileWarningActive ? 'disabled' : ''}>
+                                    <span class="text-xl mb-1">
+                                        ${categoryKey === 'globalGiants' ? '🔥 Global Giants Box' : ''}
+                                        ${categoryKey === 'chickenChampions' ? '🍗 Chicken Champions Box' : ''}
+                                        ${categoryKey === 'burgerGrillHeroes' ? '🍔 Burger & Grill Heroes Box' : ''}
+                                        ${categoryKey === 'classicFastFood' ? '🍟 Classic Fast Food Box' : ''}
+                                        ${categoryKey === 'subsWrapsBowls' ? '🌯 Subs, Wraps & Bowls Box' : ''}
+                                        ${categoryKey === 'pizzaPlayers' ? '🍕 Pizza Players Box' : ''}
+                                    </span>
+                                    <span class="text-sm">Cost: $${cost.toFixed(0)}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div class="rarity-odds">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Rarity Odds (per box):</h3>
+                            <ul class="list-disc list-inside text-gray-700">
+                                ${Object.entries(RARITY_PROBABILITIES).map(([rarity, prob]) => `
+                                    <li>${rarity}: ${(prob * 100).toFixed(1)}%</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                    break;
+                case 'inventory':
+                    html = `
+                        <h2 class="text-2xl sm:text-3xl font-bold text-red-800 mb-4 text-center">Inventory</h2>
+                        <div class="inventory-tabs">
+                            <button id="brandsTabBtn" class="inventory-tab-button ${currentInventoryView === 'brands' ? 'active' : ''}" ${isBanned || isMobileWarningActive ? 'disabled' : ''}>
+                                Your Food Brands
+                            </button>
+                            <button id="powerupsTabBtn" class="inventory-tab-button ${currentInventoryView === 'powerups' ? 'active' : ''}" ${isBanned || isMobileWarningActive ? 'disabled' : ''}>
+                                Powerups
+                            </button>
+                        </div>
+                        ${currentInventoryView === 'brands' ? `
+                            <p class="equipped-count">Equipped: ${brands.filter(b => b.equipped).length}/3</p>
+                            <div class="inventory-list">
+                                ${brands.filter(brand => brand.owned).length > 0 ?
+                                    brands.filter(brand => brand.owned).map(brand => `
+                                        <div class="inventory-item">
+                                            <div>
+                                                <p class="inventory-item-name">${brand.name} <span class="text-sm font-normal rarity-${brand.rarity.toLowerCase()}">(${brand.rarity})</span></p>
+                                                <p class="inventory-item-status">
+                                                    ${brand.equipped ? 'Equipped' : 'Not Equipped'}
+                                                </p>
+                                            </div>
+                                            <div class="inventory-item-actions">
+                                                ${!brand.equipped ? `
+                                                    <button class="inventory-action-button equip ${brands.filter(b => b.equipped).length >= 3 || isBanned || isMobileWarningActive ? 'disabled' : ''}"
+                                                        data-brand-id="${brand.id}" ${brands.filter(b => b.equipped).length >= 3 || isBanned || isMobileWarningActive ? 'disabled' : ''}>
+                                                        Equip
+                                                    </button>
+                                                ` : `
+                                                    <button class="inventory-action-button unequip ${isBanned || isMobileWarningActive ? 'disabled' : ''}"
+                                                        data-brand-id="${brand.id}" ${isBanned || isMobileWarningActive ? 'disabled' : ''}>
+                                                        Unequip
+                                                    </button>
+                                                `}
+                                                <button class="inventory-action-button sell ${isBanned || isMobileWarningActive ? 'disabled' : ''}"
+                                                    data-brand-id="${brand.id}" ${isBanned || isMobileWarningActive ? 'disabled' : ''}>
+                                                    Sell ($${brand.sellValue.toFixed(0)})
+                                                </button>
+                                            </div>
+                                        </div>
+                                    `).join('')
+                                    : `<p class="text-center text-gray-600">Your food brand inventory is empty. Open a Mystery Box!</p>`
+                                }
+                            </div>
+                        ` : `
+                            <p class="equipped-count">Equipped: ${powerups.filter(p => p.equipped).length}/3</p>
+                            <div class="inventory-list">
+                                ${powerups.filter(powerup => powerup.owned).length > 0 ?
+                                    powerups.filter(powerup => powerup.owned).map(powerup => `
+                                        <div class="inventory-item">
+                                            <div>
+                                                <p class="inventory-item-name">${powerup.name}</p>
+                                                <p class="inventory-item-status">
+                                                    ${powerup.equipped ? 'Equipped' : 'Not Equipped'}
+                                                </p>
+                                            </div>
+                                            <div class="inventory-item-actions">
+                                                ${!powerup.equipped ? `
+                                                    <button class="inventory-action-button equip ${powerups.filter(p => p.equipped).length >= 3 || isBanned || isMobileWarningActive ? 'disabled' : ''}"
+                                                        data-powerup-id="${powerup.id}" ${powerups.filter(p => p.equipped).length >= 3 || isBanned || isMobileWarningActive ? 'disabled' : ''}>
+                                                        Equip
+                                                    </button>
+                                                ` : `
+                                                    <button class="inventory-action-button unequip ${isBanned || isMobileWarningActive ? 'disabled' : ''}"
+                                                        data-powerup-id="${powerup.id}" ${isBanned || isMobileWarningActive ? 'disabled' : ''}>
+                                                        Unequip
+                                                    </button>
+                                                `}
+                                            </div>
+                                        </div>
+                                    `).join('')
+                                    : `<p class="text-center text-gray-600">Your powerup inventory is empty. Buy some powerups!</p>`
+                                }
+                            </div>
+                        `}
+                    `;
+                    break;
+                case 'upgrades':
+                    html = `
+                        <h2 class="text-2xl sm:text-3xl font-bold text-purple-800 mb-4 text-center">Upgrades</h2>
+                        <div class="upgrade-list">
+                            ${upgrades.map(upgrade => `
+                                <div class="upgrade-item">
+                                    <div>
+                                        <p class="upgrade-name">${upgrade.name}</p>
+                                        <p class="upgrade-description">${upgrade.description}</p>
+                                    </div>
+                                    <button class="buy-button ${money < upgrade.cost || upgrade.level >= upgrade.maxLevel || isBanned || isMobileWarningActive ? 'disabled' : ''}"
+                                        data-upgrade-id="${upgrade.id}" ${money < upgrade.cost || upgrade.level >= upgrade.maxLevel || isBanned || isMobileWarningActive ? 'disabled' : ''}>
+                                        ${upgrade.level >= upgrade.maxLevel ? 'Maxed' : `Buy ($${upgrade.cost.toFixed(0)})`}
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    break;
+                case 'powerups':
+                    html = `
+                        <h2 class="text-2xl sm:text-3xl font-bold text-green-800 mb-4 text-center">Powerup Shop</h2>
+                        <div class="powerup-list">
+                            ${powerups.filter(powerup => !powerup.owned).length > 0 ?
+                                powerups.filter(powerup => !powerup.owned).map(powerup => `
+                                    <div class="powerup-item">
+                                        <div>
+                                            <p class="powerup-name">${powerup.name}</p>
+                                            <p class="powerup-description">${powerup.description}</p>
+                                        </div>
+                                        <button class="buy-button ${money < powerup.cost || powerup.owned || isBanned || isMobileWarningActive ? 'disabled' : ''}"
+                                            data-powerup-id="${powerup.id}" ${money < powerup.cost || powerup.owned || isBanned || isMobileWarningActive ? 'disabled' : ''}>
+                                            ${powerup.owned ? 'Owned' : `Buy ($${powerup.cost.toFixed(0)})`}
+                                        </button>
+                                    </div>
+                                `).join('')
+                                : `<p class="text-center text-gray-600">All powerups purchased!</p>`
+                            }
+                        </div>
+                    `;
+                    break;
+                case 'main':
+                default:
+                    html = `
+                        <p class="money-display">Money: $${money.toFixed(2)}</p>
+                        <p class="click-power-display">Click Power: ${calculateTotalClickPower().toFixed(2)}</p>
+                        <button id="mainClickBtn" class="main-click-button" ${isBanned || isMobileWarningActive ? 'disabled' : ''}>
+                            Click for Fast Food!
+                        </button>
+                    `;
+                    break;
+            }
+            contentArea.innerHTML = html;
+
+            // Attach specific event listeners based on current view
+            if (currentView === 'main') {
+                document.getElementById('mainClickBtn').onclick = handleBrandClick;
+            } else if (currentView === 'shop') {
+                document.querySelectorAll('.mystery-box-button').forEach(button => {
+                    button.onclick = (event) => openMysteryBox(event.target.dataset.category || event.target.closest('button').dataset.category);
+                });
+            } else if (currentView === 'inventory') {
+                document.getElementById('brandsTabBtn').onclick = () => { currentInventoryView = 'brands'; updateUI(); };
+                document.getElementById('powerupsTabBtn').onclick = () => { currentInventoryView = 'powerups'; updateUI(); };
+
+                document.querySelectorAll('.inventory-action-button.equip[data-brand-id]').forEach(button => {
+                    button.onclick = (event) => equipBrand(event.target.dataset.brandId || event.target.closest('button').dataset.brandId);
+                });
+                document.querySelectorAll('.inventory-action-button.unequip[data-brand-id]').forEach(button => {
+                    button.onclick = (event) => unequipBrand(event.target.dataset.brandId || event.target.closest('button').dataset.brandId);
+                });
+                document.querySelectorAll('.inventory-action-button.sell[data-brand-id]').forEach(button => {
+                    button.onclick = (event) => sellBrand(event.target.dataset.brandId || event.target.closest('button').dataset.brandId);
+                });
+                document.querySelectorAll('.inventory-action-button.equip[data-powerup-id]').forEach(button => {
+                    button.onclick = (event) => equipPowerup(event.target.dataset.powerupId || event.target.closest('button').dataset.powerupId);
+                });
+                document.querySelectorAll('.inventory-action-button.unequip[data-powerup-id]').forEach(button => {
+                    button.onclick = (event) => unequipPowerup(event.target.dataset.powerupId || event.target.closest('button').dataset.powerupId);
+                });
+            } else if (currentView === 'upgrades') {
+                document.querySelectorAll('.upgrade-item .buy-button').forEach(button => {
+                    button.onclick = (event) => buyUpgrade(event.target.dataset.upgradeId || event.target.closest('button').dataset.upgradeId);
+                });
+            } else if (currentView === 'powerups') {
+                document.querySelectorAll('.powerup-item .buy-button').forEach(button => {
+                    button.onclick = (event) => buyPowerup(event.target.dataset.powerupId || event.target.closest('button').dataset.powerupId);
+                });
+            }
+        };
+
+        const renderMessageModal = () => {
+            let modalOverlay = document.getElementById('messageModalOverlay');
+            if (!modalOverlay) {
+                modalOverlay = document.createElement('div');
+                modalOverlay.id = 'messageModalOverlay';
+                modalOverlay.className = 'modal-overlay';
+                document.body.appendChild(modalOverlay);
+            }
+
+            if (message) {
+                modalOverlay.style.display = 'flex';
+                modalOverlay.innerHTML = `
+                    <div class="modal-content ${isMessageWhiteBackground ? 'white-bg' : ''}">
+                        <p class="modal-message">${message}</p>
+                        ${!isMessagePersistent ? `<button id="modalCloseBtn" class="modal-close-button">Close</button>` : ''}
+                    </div>
+                `;
+                if (!isMessagePersistent) {
+                    document.getElementById('modalCloseBtn').onclick = handleCloseMessage;
+                }
+            } else {
+                modalOverlay.style.display = 'none';
+                modalOverlay.innerHTML = '';
+            }
+        };
+
+        // --- Game Logic Functions ---
+        const calculateTotalClickPower = () => {
+            let currentClickPower = baseClickPower;
+            let brandValueMultiplier = 0;
+            let moneyMultiplier = 1;
+
+            upgrades.forEach(upgrade => {
+                if (upgrade.level > 0) {
+                    if (upgrade.effect.type === 'clickPower') {
+                        currentClickPower += upgrade.effect.value;
+                    } else if (upgrade.effect.type === 'brandValueMultiplier') {
+                        brandValueMultiplier += upgrade.effect.value;
+                    }
+                }
+            });
+
+            powerups.filter(p => p.equipped).forEach(powerup => {
+                if (powerup.effect.type === 'moneyMultiplier') {
+                    moneyMultiplier += powerup.effect.value;
+                } else if (powerup.effect.type === 'clickPower') {
+                    currentClickPower += powerup.effect.value;
+                }
+            });
+
+            const equippedBrandsValue = brands
+                .filter(brand => brand.equipped)
+                .reduce((sum, brand) => sum + brand.baseValue, 0);
+
+            return (currentClickPower + (equippedBrandsValue * (1 + brandValueMultiplier))) * moneyMultiplier;
+        };
+
+        const handleBrandClick = () => {
+            if (isBanned || isMobileWarningActive) return;
+
+            const now = Date.now();
+            clickTimestamps = clickTimestamps.filter(
+                (timestamp) => now - timestamp < DETECTION_INTERVAL_MS
+            );
+            clickTimestamps.push(now);
+
+            if (clickTimestamps.length > MAX_HUMAN_CLICKS_PER_INTERVAL) {
+                autoClickWarningCount++;
+                let banDurationMs = 0;
+                let warningMessage = "";
+                let persistent = false;
+
+                switch (autoClickWarningCount) {
+                    case 1:
+                        warningMessage = "⚠️ First Warning: Auto-clicking detected. Please stop or you'll be removed.";
+                        persistent = false;
+                        break;
+                    case 2:
+                        banDurationMs = 5 * 60 * 1000;
+                        warningMessage = "⏱ Second Offense: Timed out for 5 minutes. Rejoin after the timeout.";
+                        persistent = true;
+                        break;
+                    case 3:
+                        banDurationMs = 10 * 60 * 1000;
+                        warningMessage = "⏱ Third Offense: Timed out for 10 minutes. Rejoin after the timeout.";
+                        persistent = true;
+                        break;
+                    case 4:
+                    default:
+                        banDurationMs = 30 * 60 * 1000;
+                        warningMessage = "🛑 Fourth Offense: You have been blocked from the game due to repeated auto-clicking.";
+                        persistent = true;
+                        break;
+                }
+
+                message = warningMessage;
+                isMessagePersistent = persistent;
+
+                if (autoClickWarningCount >= 2) {
+                    isBanned = true;
+                    banEndTime = now + banDurationMs;
+                }
+
+                clickTimestamps = []; // Reset timestamps
+                renderMessageModal();
+                updateUI(); // Re-render to disable buttons
+                if (!persistent) {
+                    setTimeout(() => { message = ''; isMessagePersistent = false; renderMessageModal(); }, 5000);
+                }
+            }
+
+            money += calculateTotalClickPower();
+            updateUI(); // Update UI after money changes
+        };
+
+        // Auto-clicker effect (for in-game powerups)
+        let autoClickInterval;
+        const startAutoClicker = () => {
+            clearInterval(autoClickInterval); // Clear any existing interval
+            let autoClickRate = 0;
+            powerups.filter(p => p.equipped && p.effect.type === 'autoClick').forEach(powerup => {
+                autoClickRate += powerup.effect.value;
+            });
+
+            if (autoClickRate > 0 && !isBanned && !isMobileWarningActive) {
+                autoClickInterval = setInterval(() => {
+                    money += (calculateTotalClickPower() * autoClickRate);
+                    updateUI(); // Update UI after money changes
+                }, 1000);
+            }
+        };
+
+        const getRandomBrandFromCategory = (category) => {
+            const brandsInThisCategory = brands.filter(b => b.category === category);
+            if (brandsInThisCategory.length === 0) return null;
+
+            let random = Math.random();
+            let selectedRarity = '';
+            let cumulativeProbability = 0;
+
+            for (const rarity in RARITY_PROBABILITIES) {
+                cumulativeProbability += RARITY_PROBABILITIES[rarity];
+                if (random < cumulativeProbability) {
+                    selectedRarity = rarity;
+                    break;
+                }
+            }
+
+            const eligibleBrands = brandsInThisCategory.filter(b => b.rarity === selectedRarity);
+            if (eligibleBrands.length === 0) {
+                return allBrandsInThisCategory[Math.floor(Math.random() * allBrandsInThisCategory.length)];
+            }
+            return eligibleBrands[Math.floor(Math.random() * eligibleBrands.length)];
+        };
+
+        const openMysteryBox = (category) => {
+            if (isBanned || isMobileWarningActive) return;
+            const cost = MYSTERY_BOX_COSTS[category];
+            if (money < cost) {
+                message = `You need $${cost.toFixed(0)} to open this Mystery Box!`;
+                isMessagePersistent = false;
+                renderMessageModal();
+                setTimeout(() => { message = ''; renderMessageModal(); }, 3000);
+                return;
+            }
+
+            money -= cost;
+            const receivedBrand = getRandomBrandFromCategory(category);
+
+            if (!receivedBrand) {
+                message = 'No brands available in this category!';
+                isMessagePersistent = false;
+                renderMessageModal();
+                setTimeout(() => { message = ''; renderMessageModal(); }, 3000);
+                return;
+            }
+
+            const brandIndex = brands.findIndex(brand => brand.id === receivedBrand.id);
+            if (brandIndex !== -1) {
+                if (brands[brandIndex].owned) {
+                    const refund = Math.floor(brands[brandIndex].cost * DUPLICATE_REFUND_PERCENTAGE);
+                    money += refund;
+                    message = `You got a duplicate ${brands[brandIndex].name}! Refunded $${refund.toFixed(0)}.`;
+                } else {
+                    brands[brandIndex].owned = true;
+                    message = `Congratulations! You got a new brand: ${receivedBrand.name} (${receivedBrand.rarity})!`;
+                }
+            }
+            isMessagePersistent = false;
+            renderMessageModal();
+            setTimeout(() => { message = ''; renderMessageModal(); }, 3000);
+            updateUI();
+        };
+
+        const equipBrand = (brandId) => {
+            if (isBanned || isMobileWarningActive) return;
+            const equippedCount = brands.filter(b => b.equipped).length;
+            if (equippedCount < 3) {
+                const brandIndex = brands.findIndex(b => b.id === brandId);
+                if (brandIndex !== -1) {
+                    brands[brandIndex].equipped = true;
+                }
+            } else {
+                message = 'You can only equip up to 3 brands at a time!';
+                isMessagePersistent = false;
+                renderMessageModal();
+                setTimeout(() => { message = ''; renderMessageModal(); }, 3000);
+            }
+            updateUI();
+        };
+
+        const unequipBrand = (brandId) => {
+            if (isBanned || isMobileWarningActive) return;
+            const brandIndex = brands.findIndex(b => b.id === brandId);
+            if (brandIndex !== -1) {
+                brands[brandIndex].equipped = false;
+            }
+            updateUI();
+        };
+
+        const sellBrand = (brandId) => {
+            if (isBanned || isMobileWarningActive) return;
+            const brandIndex = brands.findIndex(brand => brand.id === brandId);
+            if (brandIndex !== -1 && brands[brandIndex].owned) {
+                money += brands[brandIndex].sellValue;
+                message = `Sold ${brands[brandIndex].name} for $${brands[brandIndex].sellValue.toFixed(0)}.`;
+                brands[brandIndex].owned = false;
+                brands[brandIndex].equipped = false; // Unequip if sold
+            }
+            isMessagePersistent = false;
+            renderMessageModal();
+            setTimeout(() => { message = ''; renderMessageModal(); }, 3000);
+            updateUI();
+        };
+
+        const buyUpgrade = (upgradeId) => {
+            if (isBanned || isMobileWarningActive) return;
+            const upgradeIndex = upgrades.findIndex(u => u.id === upgradeId);
+            if (upgradeIndex !== -1 && upgrades[upgradeIndex].level < upgrades[upgradeIndex].maxLevel && money >= upgrades[upgradeIndex].cost) {
+                money -= upgrades[upgradeIndex].cost;
+                upgrades[upgradeIndex].level++;
+                message = `You bought the ${upgrades[upgradeIndex].name} upgrade!`;
+            }
+            isMessagePersistent = false;
+            renderMessageModal();
+            setTimeout(() => { message = ''; renderMessageModal(); }, 3000);
+            updateUI();
+        };
+
+        const buyPowerup = (powerupId) => {
+            if (isBanned || isMobileWarningActive) return;
+            const powerupIndex = powerups.findIndex(p => p.id === powerupId);
+            if (powerupIndex !== -1 && !powerups[powerupIndex].owned && money >= powerups[powerupIndex].cost) {
+                money -= powerups[powerupIndex].cost;
+                powerups[powerupIndex].owned = true;
+                message = `You bought the ${powerups[powerupIndex].name} powerup! Check your Inventory > Powerups tab!`;
+            }
+            isMessagePersistent = false;
+            renderMessageModal();
+            setTimeout(() => { message = ''; renderMessageModal(); }, 5000);
+            updateUI();
+        };
+
+        const equipPowerup = (powerupId) => {
+            if (isBanned || isMobileWarningActive) return;
+            const equippedCount = powerups.filter(p => p.equipped).length;
+            if (equippedCount < 3) {
+                const powerupIndex = powerups.findIndex(p => p.id === powerupId);
+                if (powerupIndex !== -1) {
+                    powerups[powerupIndex].equipped = true;
+                    message = `Equipped ${powerups[powerupIndex].name}!`;
+                }
+            } else {
+                message = 'You can only equip up to 3 powerups at a time!';
+            }
+            isMessagePersistent = false;
+            renderMessageModal();
+            setTimeout(() => { message = ''; renderMessageModal(); }, 3000);
+            updateUI();
+        };
+
+        const unequipPowerup = (powerupId) => {
+            if (isBanned || isMobileWarningActive) return;
+            const powerupIndex = powerups.findIndex(p => p.id === powerupId);
+            if (powerupIndex !== -1) {
+                powerups[powerupIndex].equipped = false;
+            }
+            updateUI();
+        };
+
+        const checkWinCondition = () => {
+            const allBrandsOwned = brands.every(brand => brand.owned);
+            const allUpgradesMaxed = upgrades.every(upgrade => upgrade.level === upgrade.maxLevel);
+            showBeatGameButton = allBrandsOwned && allUpgradesMaxed;
+        };
+
+        const handleBeatGame = () => {
+            if (isBanned || isMobileWarningActive) return;
+            message = 'Congratulations on beating the game!';
+            isMessagePersistent = false;
+            renderMessageModal();
+            setTimeout(() => { message = ''; renderMessageModal(); }, 5000);
+        };
+
+        const handleCloseMessage = () => {
+            message = '';
+            isMessagePersistent = false;
+            isMessageWhiteBackground = false; // Reset background for non-mobile messages
+            renderMessageModal();
+        };
+
+        // --- Initialization and Event Listeners ---
+        window.onload = () => {
+            // Mobile detection
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const isMobileDevice = /android|iphone|ipad|ipod|blackberry|windows phone/i.test(userAgent) || (navigator.maxTouchPoints > 0 && window.innerWidth < 768);
+            if (isMobileDevice) {
+                isMobileWarningActive = true;
+                message = "This game is best played on PC. You can't play on mobile.";
+                isMessagePersistent = true;
+                isMessageWhiteBackground = true;
+                renderMessageModal();
+            }
+
+            loadGame(); // Load game state from local storage
+
+            // Re-evaluate ban status on load
+            const now = Date.now();
+            if (isBanned && banEndTime > now) {
+                // Ban is still active, start countdown
+                let countdownInterval = setInterval(() => {
+                    const remaining = banEndTime - Date.now();
+                    if (remaining > 0) {
+                        const minutes = Math.floor(remaining / (60 * 1000));
+                        const seconds = Math.floor((remaining % (60 * 1000)) / 1000);
+                        let banMessagePrefix = "";
+                        if (autoClickWarningCount === 2) banMessagePrefix = "⏱ Second Offense: ";
+                        if (autoClickWarningCount === 3) banMessagePrefix = "⏱ Third Offense: ";
+                        if (autoClickWarningCount >= 4) banMessagePrefix = "🛑 Fourth Offense: ";
+                        message = `${banMessagePrefix}Timed out for ${minutes}m ${seconds}s. Rejoin after the timeout.`;
+                        isMessagePersistent = true;
+                        renderMessageModal();
+                    } else {
+                        clearInterval(countdownInterval);
+                        isBanned = false;
+                        message = 'You can play again!';
+                        isMessagePersistent = false;
+                        renderMessageModal();
+                        setTimeout(() => { message = ''; renderMessageModal(); }, 3000);
+                        updateUI(); // Re-enable buttons
+                    }
+                }, 1000);
+            } else if (isBanned && banEndTime <= now) {
+                // Ban expired, unban
+                isBanned = false;
+                message = 'You can play again!';
+                isMessagePersistent = false;
+                renderMessageModal();
+                setTimeout(() => { message = ''; renderMessageModal(); }, 3000);
+            }
+
+            checkWinCondition();
+            updateUI(); // Initial UI render
+            startAutoClicker(); // Start auto-clicker if powerups are equipped
+        };
+    </script>
+</body>
+</html>
