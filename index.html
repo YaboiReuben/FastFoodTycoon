@@ -409,7 +409,7 @@
             margin-bottom: 0.75rem; /* space-y-3 */
         }
 
-        .upgrade-item:last-child, .powerup-item:last-child {
+        .upgrade-item:last-child {
             margin-bottom: 0;
         }
 
@@ -619,18 +619,20 @@
             return shuffleArray(finalBrands);
         };
 
+        // Updated initialUpgrades with maxLevel: 100 and dynamic costs/effects
         const initialUpgrades = [
-            { id: 'clickPower1', name: 'Click Power Boost I', description: 'Increases base click power by 1', cost: 150, level: 0, maxLevel: 1, effect: { type: 'clickPower', value: 1 } },
-            { id: 'brandValue1', name: 'Brand Value Boost I', description: 'Increases equipped brand values by 10%', cost: 450, level: 0, maxLevel: 1, effect: { type: 'brandValueMultiplier', value: 0.1 } },
-            { id: 'clickPower2', name: 'Click Power Boost II', description: 'Increases base click power by 2', cost: 900, level: 0, maxLevel: 1, effect: { type: 'clickPower', value: 2 } },
-            { id: 'brandValue2', name: 'Brand Value Boost II', description: 'Increases equipped brand values by 20%', cost: 1800, level: 0, maxLevel: 1, effect: { type: 'brandValueMultiplier', value: 0.2 } },
-            { id: 'clickPower3', name: 'Click Power Boost III', description: 'Increases base click power by 3', cost: 3600, level: 0, maxLevel: 1, effect: { type: 'clickPower', value: 3 } },
-            { id: 'brandValue3', name: 'Brand Value Boost III', description: 'Increases equipped brand values by 30%', cost: 7200, level: 0, maxLevel: 1, effect: { type: 'brandValueMultiplier', value: 0.3 } },
-            { id: 'clickPower4', name: 'Click Power Boost IV', description: 'Increases base click power by 5', cost: 14400, level: 0, maxLevel: 1, effect: { type: 'clickPower', value: 5 } },
-            { id: 'brandValue4', name: 'Brand Value Boost IV', description: 'Increases equipped brand values by 50%', cost: 28800, level: 0, maxLevel: 1, effect: { type: 'brandValueMultiplier', value: 0.5 } },
-            { id: 'clickPower5', name: 'Click Power Boost V', description: 'Increases base click power by 10', cost: 57600, level: 0, maxLevel: 1, effect: { type: 'clickPower', value: 10 } },
-            { id: 'ultimateClick', name: 'Ultimate Click Power', description: 'Massively increases click power by 50', cost: 115200, level: 0, maxLevel: 1, effect: { type: 'clickPower', value: 50 } },
+            { id: 'clickPower1', name: 'Click Power Boost I', description: 'Increases base click power by 1 per level', cost: 150, level: 0, maxLevel: 100, effect: { type: 'clickPower', value: 1 } },
+            { id: 'brandValue1', name: 'Brand Value Boost I', description: 'Increases equipped brand values by 0.1% per level', cost: 450, level: 0, maxLevel: 100, effect: { type: 'brandValueMultiplier', value: 0.001 } }, // 0.1% per level
+            { id: 'clickPower2', name: 'Click Power Boost II', description: 'Increases base click power by 2 per level', cost: 900, level: 0, maxLevel: 100, effect: { type: 'clickPower', value: 2 } },
+            { id: 'brandValue2', name: 'Brand Value Boost II', description: 'Increases equipped brand values by 0.2% per level', cost: 1800, level: 0, maxLevel: 100, effect: { type: 'brandValueMultiplier', value: 0.002 } }, // 0.2% per level
+            { id: 'clickPower3', name: 'Click Power Boost III', description: 'Increases base click power by 3 per level', cost: 3600, level: 0, maxLevel: 100, effect: { type: 'clickPower', value: 3 } },
+            { id: 'brandValue3', name: 'Brand Value Boost III', description: 'Increases equipped brand values by 0.3% per level', cost: 7200, level: 0, maxLevel: 100, effect: { type: 'brandValueMultiplier', value: 0.003 } }, // 0.3% per level
+            { id: 'clickPower4', name: 'Click Power Boost IV', description: 'Increases base click power by 5 per level', cost: 14400, level: 0, maxLevel: 100, effect: { type: 'clickPower', value: 5 } },
+            { id: 'brandValue4', name: 'Brand Value Boost IV', description: 'Increases equipped brand values by 0.5% per level', cost: 28800, level: 0, maxLevel: 100, effect: { type: 'brandValueMultiplier', value: 0.005 } }, // 0.5% per level
+            { id: 'clickPower5', name: 'Click Power Boost V', description: 'Increases base click power by 10 per level', cost: 57600, level: 0, maxLevel: 100, effect: { type: 'clickPower', value: 10 } },
+            { id: 'ultimateClick', name: 'Ultimate Click Power', description: 'Massively increases click power by 50 per level', cost: 115200, level: 0, maxLevel: 100, effect: { type: 'clickPower', value: 50 } },
         ];
+
 
         const initialPowerups = [
             { id: 'autoClicker1', name: 'Auto Clicker Lv.1', description: 'Automatically clicks 1 time per second', cost: 1000, owned: false, equipped: false, effect: { type: 'autoClick', value: 1 } },
@@ -691,6 +693,17 @@
             // Ensure brands and powerups have 'equipped' property if loaded from older save
             brands = brands.map(b => ({ ...b, equipped: b.equipped !== undefined ? b.equipped : false }));
             powerups = powerups.map(p => ({ ...p, equipped: p.equipped !== undefined ? p.equipped : false }));
+
+            // Ensure upgrades have correct maxLevel if loaded from older save (where it was 1)
+            upgrades = upgrades.map(loadedUpgrade => {
+                const initial = initialUpgrades.find(u => u.id === loadedUpgrade.id);
+                return {
+                    ...loadedUpgrade,
+                    maxLevel: initial ? initial.maxLevel : 100, // Default to 100 if not found, or use initial's
+                    effect: initial ? initial.effect : loadedUpgrade.effect // Ensure effect values are correct
+                };
+            });
+
 
             console.log("Game Loaded:", { money, autoClickWarningCount, isBanned, banEndTime });
         };
@@ -849,7 +862,7 @@
                                     powerups.filter(powerup => powerup.owned).map(powerup => `
                                         <div class="inventory-item">
                                             <div>
-                                                <p class="inventory-item-name">${powerup.name}</p>
+                                                <p class="powerup-name">${powerup.name}</p>
                                                 <p class="inventory-item-status">
                                                     ${powerup.equipped ? 'Equipped' : 'Not Equipped'}
                                                 </p>
@@ -869,10 +882,10 @@
                                             </div>
                                         </div>
                                     `).join('')
-                                    : `<p class="text-center text-gray-600">Your powerup inventory is empty. Buy some powerups!</p>`
-                                }
-                            </div>
-                        `}
+                                    : `<p class="text-center text-gray-600">All powerups purchased!</p>`
+                            }
+                        </div>
+                    `}
                     `;
                     break;
                 case 'upgrades':
@@ -884,6 +897,7 @@
                                     <div>
                                         <p class="upgrade-name">${upgrade.name}</p>
                                         <p class="upgrade-description">${upgrade.description}</p>
+                                        <p class="text-sm text-gray-500">Level: ${upgrade.level}/${upgrade.maxLevel}</p>
                                     </div>
                                     <button class="buy-button ${money < upgrade.cost || upgrade.level >= upgrade.maxLevel || isBanned || isMobileWarningActive ? 'disabled' : ''}"
                                         data-upgrade-id="${upgrade.id}" ${money < upgrade.cost || upgrade.level >= upgrade.maxLevel || isBanned || isMobileWarningActive ? 'disabled' : ''}>
@@ -999,12 +1013,11 @@
             let moneyMultiplier = 1;
 
             upgrades.forEach(upgrade => {
-                if (upgrade.level > 0) {
-                    if (upgrade.effect.type === 'clickPower') {
-                        currentClickPower += upgrade.effect.value;
-                    } else if (upgrade.effect.type === 'brandValueMultiplier') {
-                        brandValueMultiplier += upgrade.effect.value;
-                    }
+                // For upgrades with multiple levels, apply effect value multiplied by current level
+                if (upgrade.effect.type === 'clickPower') {
+                    currentClickPower += (upgrade.effect.value * upgrade.level);
+                } else if (upgrade.effect.type === 'brandValueMultiplier') {
+                    brandValueMultiplier += (upgrade.effect.value * upgrade.level);
                 }
             });
 
@@ -1086,7 +1099,7 @@
         const startAutoClicker = () => {
             clearInterval(autoClickInterval); // Clear any existing interval
             let autoClickRate = 0;
-            powerups.filter(p => p.equipped && p.effect.type === 'autoClick').forEach(powerup => {
+            powerups.filter(p => p.equipped).forEach(powerup => {
                 autoClickRate += powerup.effect.value;
             });
 
@@ -1116,6 +1129,9 @@
 
             const eligibleBrands = brandsInThisCategory.filter(b => b.rarity === selectedRarity);
             if (eligibleBrands.length === 0) {
+                // Fallback: if no brands of selected rarity, try a different rarity within the same category
+                // This ensures a brand is always returned if the category has brands
+                const allBrandsInThisCategory = brandsInThisCategory;
                 return allBrandsInThisCategory[Math.floor(Math.random() * allBrandsInThisCategory.length)];
             }
             return eligibleBrands[Math.floor(Math.random() * eligibleBrands.length)];
@@ -1258,6 +1274,7 @@
 
         const checkWinCondition = () => {
             const allBrandsOwned = brands.every(brand => brand.owned);
+            // Win condition now requires all upgrades to be at maxLevel (100)
             const allUpgradesMaxed = upgrades.every(upgrade => upgrade.level === upgrade.maxLevel);
             showBeatGameButton = allBrandsOwned && allUpgradesMaxed;
         };
@@ -1311,20 +1328,24 @@
                     } else {
                         clearInterval(countdownInterval);
                         isBanned = false;
-                        message = 'You can play again!';
+                        money = 0; // WIPE MONEY ON BAN EXPIRY
+                        autoClickWarningCount = 0; // Optionally reset warning count after ban
+                        message = 'Your timeout has ended, but your money has been reset as a penalty. You can play again!';
                         isMessagePersistent = false;
                         renderMessageModal();
-                        setTimeout(() => { message = ''; renderMessageModal(); }, 3000);
-                        updateUI(); // Re-enable buttons
+                        setTimeout(() => { message = ''; renderMessageModal(); }, 5000); // Give a bit longer for this message
+                        updateUI(); // Re-enable buttons and update money display
                     }
                 }, 1000);
             } else if (isBanned && banEndTime <= now) {
-                // Ban expired, unban
+                // Ban expired, unban and wipe money if it hasn't been wiped already
                 isBanned = false;
-                message = 'You can play again!';
+                money = 0; // WIPE MONEY ON BAN EXPIRY, even if reloading after it expired
+                autoClickWarningCount = 0; // Optionally reset warning count after ban
+                message = 'Your timeout has ended, but your money has been reset as a penalty. You can play again!';
                 isMessagePersistent = false;
                 renderMessageModal();
-                setTimeout(() => { message = ''; renderMessageModal(); }, 3000);
+                setTimeout(() => { message = ''; renderMessageModal(); }, 5000); // Give a bit longer for this message
             }
 
             checkWinCondition();
